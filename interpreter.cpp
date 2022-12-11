@@ -33,11 +33,11 @@ class BoxFinder {
             std::cout << s << std::endl;
           }
         }
-        std::vector<std::string> contents;
       private:
         // how far the vertical edges of the box are from
         // the left edge of the file
         std::size_t s, e;
+        std::vector<std::string> contents;
     };
 
     std::vector<Box> inProgress;
@@ -165,18 +165,6 @@ int main(int argc, char* argv[]) {
   if(argc != 2) {
     std::cout << "Usage: ./interpreter input.box" << std::endl;
     return 0;
-  }
-
-  std::cout << "testing a string" << std::endl;
-  std::vector<std::string> testVec;
-  {
-    std::string test = "test";
-    testVec.push_back(test);
-    testVec.push_back(test);
-    testVec.push_back(test);
-  }
-  for(std::string s : testVec) {
-    std::cout << s << std::endl;
   }
 
   std::ifstream input(argv[1]);

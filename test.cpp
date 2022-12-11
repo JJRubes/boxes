@@ -54,12 +54,34 @@ void BoxFinder::finaliseBox(std::size_t boxIndex) {
 }
 
 void BoxFinder::addLine(std::size_t boxIndex, std::string line) {
-  std::string boxSegment = line.substr(inProgress[0].start(), inProgress[0].end());
-  inProgress[0].add(boxSegment);
+  std::cout << "updating box: " << std::endl;
+  inProgress[boxIndex].print();
+  std::cout << "substring of: " << line << std::endl;
+  std::cout << "from: " << inProgress[boxIndex].start() << ", to: " << inProgress[boxIndex].end() << std::endl;
+  // the + 1 is because substring is exclusive of the last character
+  std::size_t length = inProgress[boxIndex].end() - inProgress[boxIndex].start() + 1;
+  std::string boxSegment = line.substr(inProgress[boxIndex].start(), length);
+  inProgress[boxIndex].add(boxSegment);
+  std::cout << "passed successfully" << std::endl;
+  std::cout << "resulting box: " << std::endl;
+  inProgress[boxIndex].print();
 }
 
 void BoxFinder::process(std::string line) {
-  if(inProgress.size() < 1) {
+  for(std::size_t i = 0; i < inProgress.size(); i++) {
+    std::size_t start = inProgress[i].start();
+    std::size_t end = inProgress[i].end();
+    addLine(i, line);
+    if(line[inProgress[i].start()] == '+') {
+      finaliseBox(i);
+      i--; // because you're removing an item from the vector
+    }
+    for(std::size_t j = start; j <= end; j++) {
+      line[j] = '.';
+    }
+  }
+
+  for(std::size_t search = line.find('+'); search != std::string::npos; search = line.find('+', search + 1)) {
     std::size_t start = line.find('+');
     if(start == std::string::npos)
       return;
@@ -68,15 +90,11 @@ void BoxFinder::process(std::string line) {
     if(end == std::string::npos)
       return;
 
-    inProgress.push_back(Box(start, end + 1));
-    addLine(0, line);
-  } else {
+    inProgress.push_back(Box(start, end));
+    addLine(inProgress.size() - 1, line);
 
-    for(std::size_t i = 0; i < inProgress.size(); i++) {
-      addLine(i, line);
-      if(line[inProgress[i].start()] == '+') {
-        finaliseBox(i);
-      }
+    for(std::size_t j = start; j <= end; j++) {
+      line[j] = '.';
     }
   }
 }

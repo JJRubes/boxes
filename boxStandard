@@ -1,0 +1,127 @@
+Temporary standard for the language.
+Nothing here is set in stone
+
+a box has a '+' in each corner
+the top and bottom edges are made up of '|' or '-'
+or other characters which are interpretted as io
+spaces ' ' are used to define the name of the box
+if it is a definition.
+
+  +- example box -a-+
+  *                 .  this is a definition for a box labeled "example box"
+  |                 o  it has 14 io pins: a*.obcdefghijk
+  +bcdef----ghijk---+
+
+a pin can be any character that is not '+', ' ', '-', '|'
+a character can be used only once for either input or output
+unless it not ambiguous which is input and output or if it is
+being overloaded
+
+  +--- example ----+
+  |                |  example definition with a as both
+  |     +---+      |  input and output
+  a-----x + y------b  where "+" is the addition function
+  |     +-o-+      |  with inputs x, y and output o
+  |       |        |
+  +-------a--------+
+
+  +-- increment example --+
+  |                       |
+  |  +---------+  +---+   |  here it is ambiguous
+  x--a example b--o 1 |   |  whether x or o is the
+  |  +--a------+  +---+   |  output of increment example
+  |     |                 |
+  +-----o-----------------+
+
+  +-- increment example --+  but with the use of arrows
+  |                       |  (^, >, v, <)
+  |  +---------+  +---+   |  the inputs and outputs can
+  x->a example b--o 1 |   |  be specified.
+  |  +--a------+  +---+   |  it doesn't matter which
+  |     |                 |  and both can be specified
+  +-----o-----------------+
+
+  +-------- overloaded add ------+
+  |                              |  here x and y are overloaded
+  |             +---+            |  TODO: better way of describing
+  x-----int-----x + y-----int----y  types
+  |             +-o-+            |
+  |               |              |
+  |               >--------------o  here I've used an arrow to
+  |                              |  make a turn, I don't know
+  |          +--------+          |  if I want to allow '+'
+  x--string--x concat y--string--y  as a corner. Currently I
+  |          +----o---+          |  won't because it's harder
+  |               |              |  to parse.
+  +---------------o--------------+
+
+if there is a pin that could accept multiple types
+and there is a pin that can accept a specific type
+always choose the more specific type
+
+a box can be a literal or a definition
+a definition has a name, a literal does not
+
+  +-- definiton --+  +---------+
+  |               |  | literal |
+  +---------------+  +---------+
+
+literals include:
+actual literals
+using an 'o' for output
+          +---+ +------+
+base 10:  | 1 | | 8742 |
+          +-o-+ +--o---+
+
+          +------------+
+hex:      | 0xDEADBEEF |
+          +-----o------+
+
+          +------------+
+binary:   | 0b01000001 |
+          +-----o------+
+
+          +-----------------+
+strings   | "Hello, World!" |
+          +--------o--------+
+
+builtin functions
+
+using x, y for input and o for output
+            +---+  +---+  +---+  +---+
+arithmetic: x + y  x - y  x * y  x / y
+            +-o-+  +-o-+  +-o-+  +-o-+
+
+some basic io
++---i---+  +---------+  +----------+  +----------+
+| print |  | get int |  | get char |  | get line |
++-------+  +----o----+  +----o-----+  +----o-----+
+
+how names work:
+a box name is between 2 spaces along an edge
+the first and last group of spaces are the start and end
+of the name
+
+all named "name"
+   +-+  +-+
+   | |  | |
+   |      |  +- name -+  +-  name    +
+   | n  n |  |        |  |           |
+   | a  a |  +--------+  +-----------+
+   | m  m |  +--------+
+   | e  e |  |        |
+   |      |  +- name -+
+   | |  | |
+   +-+  +-+
+
+and names allow spaces
+
+  +- box with spaces in the name -+
+  |                               |
+  +-------------------------------+
+
+a name cannot be only spaces
+
+  +-     -+
+  |       |  invalid box name
+  +-------+

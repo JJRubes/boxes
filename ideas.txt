@@ -1,0 +1,59 @@
+
+
+Once you have a box,
+Read edges, this will give you all the pins
+and it will give you a name
+If there is a name then it's innards will need to be parsed
+If it doesn't have a name then the function name can be read
+
+Parsing a function definition
+Find all the pins
+Find all of the boxes within it
+find all the pins on each of these
+Follow any paths from this functions pins
+follow any paths from the internal pins
+Somehow store resulting graph?
+
+From this there will need to be some sort of BoxDefinition class
+it will need:
+where it is defined
+all of the pins, their type and their location
+all of the definitions, and their location
+all of the non-definitions, their location, and what they connect to
+
+
+
+Have contents
+check edges
+  => desc
+     store the name of the function for reference
+     information can be accessed about this from the parent
+     definiton's definitions list
+     if it doesn't exist within that, then the grandparents
+     and so on
+     might also need to store its pins so that
+     the correct function can be referenced
+  => def
+     has a name which can be used to reference it
+     and the pins
+
+
+For the sake of simplicity, at least in this first version:
+Boxes will always have '+' in the corners
+Boxes can't share edges
+Paths will use <^>v to redirect
+'t' will be used instead of '+' for junctions
+Boxes can't use +-|^<>v or spaces as pins
+
+
++--------- main --------+
+|                       |
+|  +-----------------+  |
+|  | "Hello, World!" |  |
+|  +--------o--------+  |
+|           |           |
+|       +-------+       |
+|       | print |       |
+|       +-------+       |
+|                       |
++-----------------------+

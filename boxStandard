@@ -25,6 +25,18 @@ being overloaded
   |       |        |
   +-------a--------+
 
+  +---+
+  | 1 |
+  +-o-+
+    |
+  +-a---------+  +---------+
+  |  example  a--i  print  |
+  +-b---------+  +---------+
+    |
+  +-o-+
+  | 1 |
+  +---+
+
   +-- increment example --+
   |                       |
   |  +---------+  +---+   |  here it is ambiguous
@@ -125,3 +137,17 @@ a name cannot be only spaces
   +-     -+
   |       |  invalid box name
   +-------+
+
+ +
+   | +---+
+   >-x < y
+     +-o-+
+
+  +----c-+
+  |  if  |
+  | else |
+  +-p--q-+
+    |
+
+
+Maybe have a waiting pin, that all it does is wait for the signal

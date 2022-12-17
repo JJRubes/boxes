@@ -46,14 +46,41 @@ Paths will use <^>v to redirect
 Boxes can't use +-|^<>v or spaces as pins
 
 
+The epiphany:
+Don't bother with types and actually
+connecting functions with definitions.
+
 +--------- main --------+
 |                       |
 |  +-----------------+  |
 |  | "Hello, World!" |  |
 |  +--------o--------+  |
 |           |           |
-|       +-------+       |
+|       +---i---+       |
 |       | print |       |
 |       +-------+       |
 |                       |
 +-----------------------+
+
+becomes:
+def:
+  name: main
+  pins: x
+  defs: x
+  calls:
+    call:
+      name: this
+      pins: x
+    call:
+      name: "Hello, World!"
+      pins:
+	id: 'o'
+    call:
+      name: print
+      pins:
+        id: 'i'
+  connections:
+    connection:
+      first: 1
+      firstPin: 0
+      se

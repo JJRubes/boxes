@@ -34,6 +34,16 @@ class CallBox {
       name = n;
       pins.swap(p);
     }
+
+    void print() {
+      std::cout << "Call:" << std::endl;
+      std::cout << "name: " << name << std::endl;
+      std::cout << "pins:" << std::endl;
+      for(Pin p : pins) {
+        p.print();
+      }
+    }
+
   private:
     std::string name;
     std::vector<Pin> pins;
@@ -137,6 +147,34 @@ class UnparsedBox {
       if(definition)
         std::cout << "error" << std::endl;
 
+      name = "";
+      for(std::size_t i = 1; i < contents.size() - 1; i++) {
+        std::string l = "";
+        bool maybeEnd = false;
+        int spaceCount;
+        for(char c : contents.at(i)) {
+          if(maybeEnd) {
+            if(c == ' ') {
+              spaceCount++;
+            } else {
+              maybeEnd = false;
+              std::string s(spaceCount, ' ');
+              l += s;
+              l += c;
+            }
+          } else {
+            if(c == ' ') {
+              maybeEnd = true;
+              spaceCount = 1;
+            } else {
+              l += c;
+            }
+          }
+        }
+        if(l != "") {
+          name += " " + l;
+        }
+      }
       return CallBox(name, pins);
     }
 
@@ -305,20 +343,29 @@ class UnparsedBox {
 
 int main() {
   std::vector<std::string> lines;
-  lines.push_back("+-------- main --------+");
-  lines.push_back("|    string literal    |");
-  lines.push_back("|  +----------------+  |");
-  lines.push_back("|  | \"Hello World!\" |  |");
-  lines.push_back("|  +-------o--------+  |");
-  lines.push_back("|          |           |");
-  lines.push_back("|      +---i---+       |");
-  lines.push_back("|      | print |       |");
-  lines.push_back("|      +-------+       |");
-  lines.push_back("|                      |");
-  lines.push_back("+----------------------+");
+  lines.push_back("+---------- parse op -----------+");
+  lines.push_back("|                               |");
+  lines.push_back("|      +---+ +---+ +---+ +---+  |");
+  lines.push_back("|      |'+'| |'-'| |'*'| |'/'|  |");
+  lines.push_back("|      +-o-+ +-o-+ +-o-+ +-o-+  |");
+  lines.push_back("|        |     |     |     |    |");
+  lines.push_back("|      +-x-----y-----z-----w-+  |");
+  lines.push_back(">-char-i case                o--o");
+  lines.push_back("|      +-a-----b-----c-----d-+  |");
+  lines.push_back("|        |     |     |     |    |");
+  lines.push_back("|      +-o-+ +-o-+ +-o-+ +-o-+  |");
+  lines.push_back("|      |x+y| |x-y| |x*y| |x/y|  |");
+  lines.push_back("|      |+o+| |+o+| |+o+| |+o+|  |");
+  lines.push_back("|      +---+ +---+ +---+ +---+  |");
+  lines.push_back("|                               |");
+  lines.push_back("+-------------------------------+");
 
   UnparsedBox b(1, 1, lines);
   b.print();
   b.parseEdges();
   b.print();
+  if(!b.isDef()) {
+    CallBox cb = b.makeCall();
+    cb.print();
+  }
 }

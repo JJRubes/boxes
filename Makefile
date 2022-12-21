@@ -1,5 +1,8 @@
-findBoxes.out: findBoxes.cpp
-	g++ findBoxes.cpp -Wall -o findBoxes.out
+findBoxes.out: findBoxes.cpp BoxFinder.cpp BoxFinder.hpp
+	g++ findBoxes.cpp Boxfinder.cpp -Wall -o findBoxes.out
 
-breakDownBox.out: breakDownBox.cpp
-	g++ breakDownBox.cpp -Wall -o breakDownBox.out
+breakDownBox.out: breakDownBox.cpp BoxFinder.o CallBox.o DefinitionBox.o Pin.o UnparsedBox.o
+	g++ breakDownBox.cpp BoxFinder.o CallBox.o DefinitionBox.o Pin.o UnparsedBox.o -Wall -o breakDownBox.out
+
+%.o: %.cpp %.hpp
+	g++ -Wall -c -o $@ $<

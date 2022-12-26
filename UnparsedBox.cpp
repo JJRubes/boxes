@@ -37,32 +37,42 @@ void UnparsedBox::parseEdges() {
   // top
   for(int i = 0; i < width; i++) {
     if(isPin(at(i, 0))) {
-      pins.push_back(Pin(at(i, 0), i, 0));
+      if(isDef())
+        pins.push_back(Pin(at(i, 0), i, 0, Pin::DIRECTION::NORTH));
+      else
+        pins.push_back(Pin(at(i, 0), i, 0, Pin::DIRECTION::SOUTH));
     }
   }
 
   // left
   for(int i = 0; i < height; i++) {
     if(isPin(at(0, i))) {
-      pins.push_back(Pin(at(0, i), 0, i));
+      if(isDef())
+        pins.push_back(Pin(at(0, i), 0, i, Pin::DIRECTION::WEST));
+      else
+        pins.push_back(Pin(at(0, i), 0, i, Pin::DIRECTION::EAST));
     }
   }
 
   // right
   for(int i = 0; i < height; i++) {
     if(isPin(at(width - 1, i))) {
-      pins.push_back(Pin(at(width - 1, i), width - 1, i));
+      if(isDef())
+        pins.push_back(Pin(at(width - 1, i), width - 1, i, Pin::DIRECTION::EAST));
+      else
+        pins.push_back(Pin(at(width - 1, i), width - 1, i, Pin::DIRECTION::WEST));
     }
   }
 
   // bottom
   for(int i = 0; i < width; i++) {
     if(isPin(at(i, height - 1))) {
-      pins.push_back(Pin(at(i, height - 1), i, height - 1));
+      if(isDef())
+        pins.push_back(Pin(at(i, height - 1), i, height - 1, Pin::DIRECTION::SOUTH));
+      else
+        pins.push_back(Pin(at(i, height - 1), i, height - 1, Pin::DIRECTION::NORTH));
     }
   }
-
-  edgesParsed = true;
 }
 
 DefinitionBox UnparsedBox::makeDefinition() {
@@ -163,10 +173,11 @@ char UnparsedBox::at(int x, int y) {
 }
 
 void UnparsedBox::parseName() {
+  edgesParsed = true;
+
   // check the top line
   int start = scanHorizontal(0, true);
   if(start != -1) {
-  std::cout << "here" << std::endl;
     std::cout << "found start of name at " << start << std::endl;
     int end = scanHorizontal(0, false);
     std::cout << "found end of name at " << end << std::endl;

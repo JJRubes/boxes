@@ -27,8 +27,8 @@ int main() {
   b.print();
   b.parseEdges();
   b.print();
-  if(!b.isDef()) {
-    CallBox cb = b.makeCall();
-    cb.print();
-  }
+//  if(!b.isDef()) {
+//    CallBox cb = b.makeCall();
+//    cb.print();
+//  }
 }

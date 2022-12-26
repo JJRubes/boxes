@@ -2,10 +2,11 @@
 
 #include"Pin.hpp"
 
-Pin::Pin(char id, int x, int y) {
+Pin::Pin(char id, int x, int y, DIRECTION n) {
   identifier = id;
   posX = x;
   posY = y;
+  normal = n;
 }
 
 char Pin::getId() {
@@ -18,6 +19,10 @@ int Pin::x() {
 
 int Pin::y() {
   return posY;
+}
+
+Pin::DIRECTION Pin::getNormal() {
+  return normal;
 }
 
 void Pin::print() {

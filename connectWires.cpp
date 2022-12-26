@@ -2,26 +2,7 @@
 #include<vector>
 #include<iostream>
 
-class Pin {
-  public:
-    enum class DIRECTION {
-      NORTH,
-      SOUTH,
-      EAST,
-      WEST
-    };
-
-    Pin(char iden, int posX, int posY, DIRECTION n) {
-      id = iden;
-      x = posX;
-      y = posY;
-      normal = n;
-    }
-
-    int x, y;
-    char id;
-    DIRECTION normal;
-};
+#include"Pin.hpp"
 
 class Connection {
   public:
@@ -60,9 +41,9 @@ FindConnections::FindConnections(std::vector<std::string> c, std::vector<Pin> p)
 
 void FindConnections::findPath(std::size_t index) {
   int maxIterations = contents.size() * contents[0].size();
-  int x = pins[index].x;
-  int y = pins[index].y;
-  Pin::DIRECTION direction = pins[index].normal;
+  int x = pins[index].x();
+  int y = pins[index].y();
+  Pin::DIRECTION direction = pins[index].getNormal();
 
   std::string typeInfo = "";
   bool ordered = false;
@@ -87,19 +68,19 @@ void FindConnections::findPath(std::size_t index) {
 
     // check for a pin here
     for(std::size_t i = 0; i < pins.size(); i++) {
-      if(pins[i].x == x)
+      if(pins[i].x() == x)
         std::cout << "(MATCH, ";
       else
-        std::cout << "(   " << pins[i].x << ", ";
+        std::cout << "(   " << pins[i].x() << ", ";
 
-      if(pins[i].y == y)
+      if(pins[i].y() == y)
         std::cout << "MATCH)";
       else
-        std::cout << "   " << pins[i].y << ")";
+        std::cout << "   " << pins[i].y() << ")";
 
       std::cout << std::endl;
 
-      if(pins[i].x == x && pins[i].y == y) {
+      if(pins[i].x() == x && pins[i].y() == y) {
         connections.push_back(Connection(index, i, typeInfo, ordered));
         return;
       }
@@ -200,7 +181,7 @@ void FindConnections::findPath(std::size_t index) {
 void FindConnections::printMap(int x, int y) {
   std::cout << "Current character: " << contents[y][x] << std::endl;
   for(std::size_t i = 0; i < contents.size(); i++) {
-    if(i == y) {
+    if(i == (size_t)y) {
       std::cout << contents[i].substr(0, x);
       std::cout << "*";
       std::cout << contents[i].substr(x + 1, std::string::npos);
@@ -291,8 +272,8 @@ int main() {
 
   // first check that everything is where it says it is
   for(Pin p : pins) {
-    if(p.id != lines[p.y][p.x]) {
-      std::cout << "Pin " << p.id << " at (" << p.x << ", " << p.y << ") doesn't exist in text" << std::endl;
+    if(p.getId() != lines[p.y()][p.x()]) {
+      std::cout << "Pin " << p.getId() << " at (" << p.x() << ", " << p.y() << ") doesn't exist in text" << std::endl;
     }
   }
 

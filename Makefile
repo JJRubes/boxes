@@ -1,3 +1,6 @@
+connectWires.out: connectWires.cpp
+	g++ connectWires.cpp -Wall -o connectWires.out
+
 findBoxes.out: findBoxes.cpp BoxFinder.cpp BoxFinder.hpp
 	g++ findBoxes.cpp Boxfinder.cpp -Wall -o findBoxes.out
 

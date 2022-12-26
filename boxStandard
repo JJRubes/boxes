@@ -151,3 +151,57 @@ a name cannot be only spaces
 
 
 Maybe have a waiting pin, that all it does is wait for the signal
+
+Possible construction to allow for loops and conditionals:
+If:
+
+  +--i--+
+  |  if |
+  +--a--+
+
+If the input 'i' is true then it send a value to a.
+This is able to implement other common constructions
+such as if..else:
+
+  +-- if a else b ---+
+  |                  |
+  |          +-----+ |
+  i----t-----i not | |
+  |    |     +--o--+ |
+  |    |        |    |
+  |  +-i--+  +--i-+  |
+  |  | if |  | if |  |
+  |  +-o--+  +--o-+  |
+  |    |        |    |
+  +----a--------b----+
+
+Default:
+
+  +---i---j---+
+  |  default  |
+  +-----o-----+
+
+Default will send the value of 'i' until it receives a
+value for 'j'.
+This, along with the if is powerful enough to implement loops
+Here wait just passes i to o and waits on the if.
+
+               +-------+
+               | print |
+               +---i---+
+                   |
+     +---------+   |    +---+  +-----+
+     | default o---t----x < y--o 100 |
+     +-i-----j-+   |    +-o-+  +-----+
+       |     |     |      |
+     +-o-+ +-o-+   |   +--i-+
+     | 0 | | + y---<   | if |
+     +---+ +-x-+       +-o--+
+             |           |
+          +--o---+       |
+          | wait s-------<
+          +--i---+
+             |
+           +-o-+
+           | 1 |
+           +---+

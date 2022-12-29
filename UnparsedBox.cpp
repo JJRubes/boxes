@@ -4,6 +4,7 @@
 #include"BoxFinder.hpp"
 #include"CallBox.hpp"
 #include"DefinitionBox.hpp"
+#include"FindConnections.hpp"
 #include"Pin.hpp"
 #include"UnparsedBox.hpp"
 
@@ -103,11 +104,14 @@ DefinitionBox UnparsedBox::makeDefinition() {
     }
   }
 
-  // for all the pins in this definition
-  // and all the pins of the call boxes
-  // follow the connection
+  std::vector<Connection> connections;
+  // this does a swap on contents and pins
+  FindConnections fc = FindConnections(contents, pins);
+  fc.process();
+  // very hacky way around just passing the vectors by reference
+  fc.move(contents, pins, connections);
 
-  return DefinitionBox(name, pins, definitions, calls);
+  return DefinitionBox(name, pins, definitions, calls, connections);
 }
 
 CallBox UnparsedBox::makeCall() {

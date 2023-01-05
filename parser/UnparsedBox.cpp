@@ -39,9 +39,9 @@ void UnparsedBox::parseEdges() {
   for(int i = 0; i < width; i++) {
     if(isPin(at(i, 0))) {
       if(isDef())
-        pins.push_back(Pin(at(i, 0), i, 0, Pin::DIRECTION::NORTH));
-      else
         pins.push_back(Pin(at(i, 0), i, 0, Pin::DIRECTION::SOUTH));
+      else
+        pins.push_back(Pin(at(i, 0), i, 0, Pin::DIRECTION::NORTH));
     }
   }
 
@@ -49,9 +49,9 @@ void UnparsedBox::parseEdges() {
   for(int i = 0; i < height; i++) {
     if(isPin(at(0, i))) {
       if(isDef())
-        pins.push_back(Pin(at(0, i), 0, i, Pin::DIRECTION::WEST));
-      else
         pins.push_back(Pin(at(0, i), 0, i, Pin::DIRECTION::EAST));
+      else
+        pins.push_back(Pin(at(0, i), 0, i, Pin::DIRECTION::WEST));
     }
   }
 
@@ -59,9 +59,9 @@ void UnparsedBox::parseEdges() {
   for(int i = 0; i < height; i++) {
     if(isPin(at(width - 1, i))) {
       if(isDef())
-        pins.push_back(Pin(at(width - 1, i), width - 1, i, Pin::DIRECTION::EAST));
-      else
         pins.push_back(Pin(at(width - 1, i), width - 1, i, Pin::DIRECTION::WEST));
+      else
+        pins.push_back(Pin(at(width - 1, i), width - 1, i, Pin::DIRECTION::EAST));
     }
   }
 
@@ -69,19 +69,22 @@ void UnparsedBox::parseEdges() {
   for(int i = 0; i < width; i++) {
     if(isPin(at(i, height - 1))) {
       if(isDef())
-        pins.push_back(Pin(at(i, height - 1), i, height - 1, Pin::DIRECTION::SOUTH));
-      else
         pins.push_back(Pin(at(i, height - 1), i, height - 1, Pin::DIRECTION::NORTH));
+      else
+        pins.push_back(Pin(at(i, height - 1), i, height - 1, Pin::DIRECTION::SOUTH));
     }
   }
 }
 
 DefinitionBox UnparsedBox::makeDefinition() {
+  // print();
+  // checks to make sure that the Unparsed box is being used correctly
   if(!edgesParsed)
     std::cout << "error" << std::endl;
 
   if(!definition)
     std::cout << "error" << std::endl;
+
 
   std::vector<DefinitionBox> definitions;
   std::vector<CallBox> calls;
@@ -106,12 +109,10 @@ DefinitionBox UnparsedBox::makeDefinition() {
 
   std::vector<Connection> connections;
   // this does a swap on contents and pins
-  FindConnections fc = FindConnections(contents, pins);
+  FindConnections fc = FindConnections(contents, pins, calls, definitions, tlx, tly);
   fc.process();
-  // very hacky way around just passing the vectors by reference
-  fc.move(contents, pins, connections);
 
-  return DefinitionBox(name, pins, definitions, calls, connections);
+  return DefinitionBox(name, pins, definitions, calls, connections, tlx, tly);
 }
 
 CallBox UnparsedBox::makeCall() {
@@ -122,34 +123,49 @@ CallBox UnparsedBox::makeCall() {
     std::cout << "error" << std::endl;
 
   name = "";
+  // cuts whitespace from the start of each line in the box
+  // and ignores blank lines
   for(std::size_t i = 1; i < contents.size() - 1; i++) {
     std::string l = "";
     bool maybeEnd = false;
     int spaceCount;
-    for(char c : contents.at(i)) {
-      if(maybeEnd) {
-        if(c == ' ') {
+
+    // remove starting spaces
+    int startPos = 1;
+    while(contents.at(i).at(startPos) == ' ') {
+      startPos++;
+    }
+
+    // remove ending spaces
+    for(size_t j = startPos; j < contents.at(i).size() - 1; j++) {
+      char c = contents.at(i).at(j);
+      if(c == ' ') {
+        if(maybeEnd) {
           spaceCount++;
         } else {
-          maybeEnd = false;
-          std::string s(spaceCount, ' ');
-          l += s;
-          l += c;
-        }
-      } else {
-        if(c == ' ') {
           maybeEnd = true;
           spaceCount = 1;
-        } else {
-          l += c;
         }
+      } else if(maybeEnd) {
+        maybeEnd = false;
+        std::string s(spaceCount, ' ');
+        l += s;
+        l += c;
+      } else {
+        l += c;
       }
     }
+
+    // add the line to the name
     if(l != "") {
-      name += " " + l;
+      if(name != "") {
+        name += " ";
+      }
+      name += l;
     }
   }
-  return CallBox(name, pins);
+  // print();
+  return CallBox(name, pins, tlx, tly);
 }
 
 void UnparsedBox::print() {
@@ -157,12 +173,18 @@ void UnparsedBox::print() {
     for(std::string s : contents) {
       std::cout << s << std::endl;
     }
-  } else if(isDef()) {
+  } else {
+    if(isDef()) {
+      std::cout << "Definition ";
+    } else {
+      std::cout << "Call ";
+    }
     std::cout << name << ": " << std::endl;
     for(Pin p : pins) {
-      p.print();
+      p.print(0, 2);
     }
   }
+  std::cout << "At (" << tlx << ", " << tly << ")";
 }
 
 const bool UnparsedBox::isPin(char p) {
@@ -182,9 +204,7 @@ void UnparsedBox::parseName() {
   // check the top line
   int start = scanHorizontal(0, true);
   if(start != -1) {
-    std::cout << "found start of name at " << start << std::endl;
     int end = scanHorizontal(0, false);
-    std::cout << "found end of name at " << end << std::endl;
     if(end < start) {
       std::cout << "Error: found spaces on top edge that didn't contain a name." << std::endl;
       return;
@@ -231,14 +251,12 @@ void UnparsedBox::parseName() {
 }
 
 int UnparsedBox::scanHorizontal(int line, bool forwards) {
-  std::cout << "scanning line " << line << std::endl;
   bool spaces = false;
   int last = -1;
   int start = forwards ? 0 : width - 1;
   int end = forwards ? width : -1;
   int inc = forwards ? 1 : -1;
   for(int i = start; inc * i < end; i += inc) {
-    std::cout << at(i, line) << ", " << i << std::endl;
     if(spaces) {
       if(at(i, line) != ' ') {
         last = i;
@@ -277,10 +295,14 @@ int UnparsedBox::scanVertical(int line, bool forwards) {
 void UnparsedBox::getName(int start, int end, int line, bool horizontal) {
   if(horizontal) {
     name = std::string(contents.at(line), start, end - start + 1);
-    std::cout << "name is " << name << std::endl;
     // then blank it
     for(int i = start; i <= end; i++) {
       contents[line][i] = '-';
+    }
+    for(size_t i = 0; i < contents.at(line).size(); i++) {
+      if(contents[line][i] == ' ') {
+        contents[line][i] = '-';
+      }
     }
   } else {
     name = std::string(start - end + 1, '.');
@@ -291,6 +313,12 @@ void UnparsedBox::getName(int start, int end, int line, bool horizontal) {
     for(int i = start; i <= end; i++) {
       contents[i][line] = '|';
     }
+    for(size_t i = 0; i < contents.size(); i++) {
+      if(contents[i][line] == ' ') {
+        contents[i][line] = '|';
+      }
+    }
   }
+
   definition = true;
 }

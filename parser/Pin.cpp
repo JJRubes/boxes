@@ -1,4 +1,5 @@
 #include<iostream>
+#include<string>
 
 #include"Pin.hpp"
 
@@ -13,11 +14,11 @@ char Pin::getId() {
   return identifier;
 }
 
-int Pin::x() {
+const int Pin::x() {
   return posX;
 }
 
-int Pin::y() {
+const int Pin::y() {
   return posY;
 }
 
@@ -25,7 +26,25 @@ Pin::DIRECTION Pin::getNormal() {
   return normal;
 }
 
-void Pin::print() {
-  std::cout << "id: " << identifier << std::endl;
-  std::cout << "pos: (" << posX << ", " << posY << ")" << std::endl;
+void Pin::print(std::size_t indentation, std::size_t indentSize) {
+  std::string indent(indentation * indentSize, ' ');
+  std::string additional(indentSize, ' ');
+  std::cout << indent << "Pin:\n";
+  std::cout << indent << additional << "id: '" << identifier << "'\n";
+  std::cout << indent << additional << "pos: (" << posX << ", " << posY << ")\n";
+  std::cout << indent << additional << "normal: ";
+  switch(normal) {
+    case Pin::DIRECTION::NORTH:
+      std::cout << "North\n";
+      break;
+    case Pin::DIRECTION::SOUTH:
+      std::cout << "South\n";
+      break;
+    case Pin::DIRECTION::EAST:
+      std::cout << "East\n";
+      break;
+    case Pin::DIRECTION::WEST:
+      std::cout << "West\n";
+      break;
+  }
 }

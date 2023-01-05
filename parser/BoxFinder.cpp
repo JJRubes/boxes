@@ -23,8 +23,7 @@ void BoxFinder::addLine(std::size_t boxIndex, std::string line) {
 }
 
 void BoxFinder::process(std::string line) {
-  // update line number
-  // this also means that line number is 1 indexed
+  // line number is 1 indexed
   lineNo++;
 
   // update all of the current boxes
@@ -113,10 +112,15 @@ void BoxFinder::Box::print() {
 }
 
 UnparsedBox BoxFinder::Box::move() {
-  UnparsedBox ub = UnparsedBox(s, l, contents);
+  // the s + 1 is to account for the edge of the parent box
+  UnparsedBox ub = UnparsedBox(s + 1, l, contents);
   return ub;
 }
 
-void BoxFinder::move(std::vector<UnparsedBox> boxes) {
-  finalised.swap(boxes);
+void BoxFinder::move(std::vector<UnparsedBox> &nextBoxVector) {
+  finalised.swap(nextBoxVector);
+  // for(UnparsedBox b : nextBoxVector) {
+  //   b.print();
+  //   std::cout << "\n";
+  // }
 }

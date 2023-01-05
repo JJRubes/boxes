@@ -1,4 +1,8 @@
-
+Error handling
+Have some sort of simple error class or something
+The top level has a list of errors, everytime an error is encountered it is added to the list.
+If an error happens within some sort of recursive call the list of errors are passed up the call and each time the appropriate information is added.
+That way you can have an error that specifies the coordinates within the box, then the box that contains it adds its coordinates to the error and so on.
 
 Once you have a box,
 Read edges, this will give you all the pins

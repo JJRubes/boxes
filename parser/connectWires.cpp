@@ -25,27 +25,66 @@ int main() {
   lines.push_back("|      +---+ +---+ +---+ +---+  |"); // 13 
   lines.push_back("|                               |"); // 14 
   lines.push_back("+-------------------------------+"); // 15 
+  // the pins of the outer box
   std::vector<Pin> pins;
-  pins.push_back(Pin('o',  9,  4, Pin::DIRECTION::SOUTH));
-  pins.push_back(Pin('o', 15,  4, Pin::DIRECTION::SOUTH));
-  pins.push_back(Pin('o', 21,  4, Pin::DIRECTION::SOUTH));
-  pins.push_back(Pin('o', 27,  4, Pin::DIRECTION::SOUTH));
-  pins.push_back(Pin('x',  9,  6, Pin::DIRECTION::NORTH));
-  pins.push_back(Pin('y', 15,  6, Pin::DIRECTION::NORTH));
-  pins.push_back(Pin('z', 21,  6, Pin::DIRECTION::NORTH));
-  pins.push_back(Pin('w', 27,  6, Pin::DIRECTION::NORTH));
   pins.push_back(Pin('>',  0,  7, Pin::DIRECTION::EAST));
-  pins.push_back(Pin('i',  7,  7, Pin::DIRECTION::WEST));
-  pins.push_back(Pin('o', 29,  7, Pin::DIRECTION::EAST));
   pins.push_back(Pin('o', 32,  7, Pin::DIRECTION::WEST));
-  pins.push_back(Pin('a',  9,  8, Pin::DIRECTION::SOUTH));
-  pins.push_back(Pin('b', 15,  8, Pin::DIRECTION::SOUTH));
-  pins.push_back(Pin('c', 21,  8, Pin::DIRECTION::SOUTH));
-  pins.push_back(Pin('d', 27,  8, Pin::DIRECTION::SOUTH));
-  pins.push_back(Pin('o',  9, 10, Pin::DIRECTION::NORTH));
-  pins.push_back(Pin('o', 15, 10, Pin::DIRECTION::NORTH));
-  pins.push_back(Pin('o', 21, 10, Pin::DIRECTION::NORTH));
-  pins.push_back(Pin('o', 27, 10, Pin::DIRECTION::NORTH));
+  std::vector<CallBox> calls;
+  {
+    std::vector<Pin> ps;
+    ps.push_back(Pin('o',  9,  4, Pin::DIRECTION::SOUTH));
+    calls.push_back(CallBox("+", ps));
+  }
+  {
+    std::vector<Pin> ps;
+    ps.push_back(Pin('o', 15,  4, Pin::DIRECTION::SOUTH));
+    calls.push_back(CallBox("-", ps));
+  }
+  {
+    std::vector<Pin> ps;
+    ps.push_back(Pin('o', 21,  4, Pin::DIRECTION::SOUTH));
+    calls.push_back(CallBox("*", ps));
+  }
+  {
+    std::vector<Pin> ps;
+    ps.push_back(Pin('o', 27,  4, Pin::DIRECTION::SOUTH));
+    calls.push_back(CallBox("", ps));
+  }
+  {
+    std::vector<Pin> ps;
+    ps.push_back(Pin('x',  9,  6, Pin::DIRECTION::NORTH));
+    ps.push_back(Pin('y', 15,  6, Pin::DIRECTION::NORTH));
+    ps.push_back(Pin('z', 21,  6, Pin::DIRECTION::NORTH));
+    ps.push_back(Pin('w', 27,  6, Pin::DIRECTION::NORTH));
+    ps.push_back(Pin('i',  7,  7, Pin::DIRECTION::WEST));
+    ps.push_back(Pin('o', 29,  7, Pin::DIRECTION::EAST));
+    ps.push_back(Pin('a',  9,  8, Pin::DIRECTION::SOUTH));
+    ps.push_back(Pin('b', 15,  8, Pin::DIRECTION::SOUTH));
+    ps.push_back(Pin('c', 21,  8, Pin::DIRECTION::SOUTH));
+    ps.push_back(Pin('d', 27,  8, Pin::DIRECTION::SOUTH));
+    calls.push_back(CallBox("case", ps));
+  }
+  {
+    std::vector<Pin> ps;
+    ps.push_back(Pin('o',  9, 10, Pin::DIRECTION::NORTH));
+    calls.push_back(CallBox("func", ps));
+  }
+  {
+    std::vector<Pin> ps;
+    ps.push_back(Pin('o', 15, 10, Pin::DIRECTION::NORTH));
+    calls.push_back(CallBox("func", ps));
+  }
+  {
+    std::vector<Pin> ps;
+    ps.push_back(Pin('o', 21, 10, Pin::DIRECTION::NORTH));
+    calls.push_back(CallBox("func", ps));
+  }
+  {
+    std::vector<Pin> ps;
+    ps.push_back(Pin('o', 27, 10, Pin::DIRECTION::NORTH));
+    calls.push_back(CallBox("func", ps));
+  }
+  std::vector<DefinitionBox> definitions;
 
   // first check that everything is where it says it is
   for(Pin p : pins) {
@@ -54,7 +93,7 @@ int main() {
     }
   }
 
- FindConnections fc = FindConnections(lines, pins);
+ FindConnections fc = FindConnections(lines, pins, calls, definitions);
  fc.process();
  fc.print();
 }

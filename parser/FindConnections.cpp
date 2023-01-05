@@ -2,19 +2,42 @@
 #include<vector>
 #include<iostream>
 
+#include"CallBox.hpp"
 #include"Connection.hpp"
+#include"DefinitionBox.hpp"
 #include"FindConnections.hpp"
+#include"Pin.hpp"
 
-FindConnections::FindConnections(std::vector<std::string> c, std::vector<Pin> p) {
-  contents.swap(c);
-  pins.swap(p);
+// references to vectors are used here (instead of swaps) as
+// the class is not the owner, it just needs access
+FindConnections::FindConnections(const std::vector<std::string> &c, 
+                const std::vector<Pin> &p,
+                const std::vector<CallBox> &cb,
+                const std::vector<DefinitionBox> &db,
+                int x, int y) {
+  contents = c;
+  pins = p;
+  definitions = db;
+  calls = cb;
+
+  selfOffsetX = x;
+  selfOffsetY = y;
 }
 
-void FindConnections::findPath(std::size_t index) {
+void FindConnections::findPath(Connection::BoxType t, std::size_t b, std::size_t p) {
   int maxIterations = contents.size() * contents[0].size();
-  int x = pins[index].x();
-  int y = pins[index].y();
-  Pin::DIRECTION direction = pins[index].getNormal();
+  int x = getPinX(t, b, p);
+  int y = getPinY(t, b, p);
+  Pin::DIRECTION direction = getPin(t, b, p).getNormal();
+
+  // if(t == Connection::BoxType::SELF) {
+  //   std::cout << "Finding path from self." << getPin(t, b, p).getId() << std::endl;
+  // } else if(t == Connection::BoxType::CALL) {
+  //   std::cout << "Finding path from call \"" << calls[b].getName() << "\", '" << getPin(t, b, p).getId() << "'" << std::endl;
+  // } else {
+  //   std::cout << "Finding path from definition \"" << definitions[b].getName() << "\", '" << getPin(t, b, p).getId() << "'" << std::endl;
+  // }
+  // std::cout << "Starting at (" << x << ", " << y << ")" << std::endl;
 
   std::string typeInfo = "";
   bool ordered = false;
@@ -38,24 +61,8 @@ void FindConnections::findPath(std::size_t index) {
     }
 
     // check for a pin here
-    for(std::size_t i = 0; i < pins.size(); i++) {
-      if(pins[i].x() == x)
-        std::cout << "(MATCH, ";
-      else
-        std::cout << "(   " << pins[i].x() << ", ";
-
-      if(pins[i].y() == y)
-        std::cout << "MATCH)";
-      else
-        std::cout << "   " << pins[i].y() << ")";
-
-      std::cout << std::endl;
-
-      if(pins[i].x() == x && pins[i].y() == y) {
-        connections.push_back(Connection(index, i, typeInfo, ordered));
-        return;
-      }
-    }
+    if(makeConnection(t, b, p, typeInfo, ordered, x, y))
+      return;
 
     // otherwise check the current position
     // to see how to continue on the path
@@ -145,10 +152,11 @@ void FindConnections::findPath(std::size_t index) {
     }
     iterations++;
 
-    printMap(x, y);
+    // printMap(x, y);
   }
 }
 
+// debugging info that shows the whole box and where it is looking
 void FindConnections::printMap(int x, int y) {
   std::cout << "Current character: " << contents[y][x] << std::endl;
   for(std::size_t i = 0; i < contents.size(); i++) {
@@ -163,12 +171,111 @@ void FindConnections::printMap(int x, int y) {
   }
 }
 
-bool FindConnections::connected(size_t index) {
+// checks if a pin has already been connected
+bool FindConnections::connected(Connection::BoxType t, size_t b, size_t p) {
   for(Connection c : connections) {
-    if(c.p1 == index || c.p2 == index) {
+    if((c.t1 == t && c.b1 == b && c.p1 == p) || (c.t2 == t && c.b2 == b && c.p2 == p)) {
       return true;
     }
   }
+  return false;
+}
+
+Pin FindConnections::getPin(Connection::BoxType t, size_t b, size_t p) {
+  switch(t) {
+    case Connection::BoxType::SELF:
+      return pins[p];
+    case Connection::BoxType::CALL:
+      return calls[b].getPin(p);
+    case Connection::BoxType::DEFINITION:
+      return definitions[b].getPin(p);
+    default:
+      std::cout << "Error" << std::endl;
+      return Pin('x', 0, 0, Pin::DIRECTION::NORTH);
+  }
+}
+
+bool FindConnections::makeConnection(Connection::BoxType t, size_t b, size_t p, std::string typeInfo, bool ordered, int x, int y) {
+  // first check self
+  for(std::size_t i = 0; i < pins.size(); i++) {
+    int currx = getPinX(Connection::BoxType::SELF, 0, i);
+    int curry = getPinY(Connection::BoxType::SELF, 0, i);
+
+    // if(currx == x)
+    //   std::cout << "(MATCH, ";
+    // else
+    //   std::cout << "(   " << currx << ", ";
+
+    // if(curry == y)
+    //   std::cout << "MATCH)";
+    // else
+    //   std::cout << "   " << curry << ")";
+
+    // std::cout << std::endl;
+
+    if(currx == x && curry == y) {
+      Connection c(t, b, p,
+                   Connection::BoxType::SELF, 0, i,
+                   typeInfo, ordered);
+      connections.push_back(c);
+      return true;
+    }
+  }
+
+  // then calls
+  for(std::size_t i = 0; i < calls.size(); i++) {
+    for(std::size_t j = 0; j < calls[i].getPins().size(); j++) {
+      int currx = getPinX(Connection::BoxType::CALL, i, j);
+      int curry = getPinY(Connection::BoxType::CALL, i, j);
+
+      // if(currx == x)
+      //   std::cout << "(MATCH, ";
+      // else
+      //   std::cout << "(   " << currx << ", ";
+
+      // if(curry == y)
+      //   std::cout << "MATCH)";
+      // else
+      //   std::cout << "   " << curry << ")";
+
+      // std::cout << std::endl;
+
+      if(currx == x && curry == y) {
+        Connection c(t, b, p,
+                     Connection::BoxType::CALL, i, j,
+                     typeInfo, ordered);
+        connections.push_back(c);
+        return true;
+      }
+    }
+  }
+
+  // definition pins don't need to be connected to anything outside themselves
+  // for(std::size_t i = 0; i < definitions.size(); i++) {
+  //   for(std::size_t j = 0; j < definitions[i].getPins().size(); j++) {
+  //     int currx = getPinX(Connection::BoxType::DEFINITION, i, j);
+  //     int curry = getPinY(Connection::BoxType::DEFINITION, i, j);
+  //     if(currx == x)
+  //       std::cout << "(MATCH, ";
+  //     else
+  //       std::cout << "(   " << currx << ", ";
+
+  //     if(curry == y)
+  //       std::cout << "MATCH)";
+  //     else
+  //       std::cout << "   " << curry << ")";
+
+  //     std::cout << std::endl;
+  //     if(currx == x && curry == y) {
+  //       Connection c(t, b, p,
+  //                    Connection::BoxType::DEFINITION, i, j,
+  //                    typeInfo, ordered);
+  //       connections.push_back(c);
+  //       return true;
+  //     }
+  //   }
+  // }
+
   return false;
 }
 
@@ -178,15 +285,66 @@ bool FindConnections::connected(size_t index) {
 // note that this implementation does not allow the
 // use of 't' or any character as a junction
 void FindConnections::process() {
+  // Self
   for(std::size_t i = 0; i < pins.size(); i++) {
     // check if it already has a connection
-    if(connected(i)) {
+    if(connected(Connection::BoxType::SELF, 0, i)) {
       continue;
     }
 
     // otherwise start traversing the line
-    findPath(i);
+    findPath(Connection::BoxType::SELF, 0, i);
   }
+
+  // then calls
+  for(std::size_t i = 0; i < calls.size(); i++) {
+    for(std::size_t j = 0; j < calls[i].getPins().size(); j++) {
+      // check if it already has a connection
+      if(connected(Connection::BoxType::CALL, i, j)) {
+        continue;
+      }
+
+      // otherwise start traversing the line
+      findPath(Connection::BoxType::CALL, i, j);
+    }
+  }
+
+  // then definitions
+  // for(std::size_t i = 0; i < definitions.size(); i++) {
+  //   for(std::size_t j = 0; j < definitions[i].getPins().size(); j++) {
+  //     // check if it already has a connection
+  //     if(connected(Connection::BoxType::DEFINITION, i, j)) {
+  //       continue;
+  //     }
+
+  //     // otherwise start traversing the line
+  //     findPath(Connection::BoxType::DEFINITION, i, j);
+  //   }
+  // }
+}
+
+int FindConnections::getPinX(Connection::BoxType t, size_t b, size_t p) {
+  int x = getPin(t, b, p).x();
+  if(t == Connection::BoxType::SELF) {
+    // x -= selfOffsetX;
+  } else if(t == Connection::BoxType::CALL) {
+    x += calls[b].getX();
+  } else {
+    x += definitions[b].getX();
+  }
+  return x;
+}
+
+int FindConnections::getPinY(Connection::BoxType t, size_t b, size_t p) {
+  int y = getPin(t, b, p).y();
+  if(t == Connection::BoxType::SELF) {
+    // y -= selfOffsetY;
+  } else if(t == Connection::BoxType::CALL) {
+    y += calls[b].getY();
+  } else {
+    y += definitions[b].getY();
+  }
+  return y;
 }
 
 void FindConnections::print() {
@@ -197,10 +355,4 @@ void FindConnections::print() {
     std::cout << ", Ordered: " << c.ordered;
     std::cout << std::endl;
   }
-}
-
-void FindConnections::move(std::vector<std::string> lines, std::vector<Pin> p, std::vector<Connection> cns) {
-  contents.swap(lines);
-  pins.swap(p);
-  connections.swap(cns);
 }

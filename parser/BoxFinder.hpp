@@ -15,7 +15,7 @@ class BoxFinder {
     // this doesn't include the edges.
     void process(std::string line);
     void printBoxes();
-    void move(std::vector<UnparsedBox> boxes);
+    void move(std::vector<UnparsedBox> &nextBoxVector);
 
   private:
     class Box {

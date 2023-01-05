@@ -11,6 +11,7 @@
 UnparsedBox::UnparsedBox(int x, int y, std::vector<std::string> lines) {
   tlx = x;
   tly = y;
+
   contents.swap(lines);
 
   // this assumes every line is consistent in length
@@ -78,6 +79,7 @@ void UnparsedBox::parseEdges() {
 
 DefinitionBox UnparsedBox::makeDefinition() {
   // print();
+
   // checks to make sure that the Unparsed box is being used correctly
   if(!edgesParsed)
     std::cout << "error" << std::endl;
@@ -86,18 +88,22 @@ DefinitionBox UnparsedBox::makeDefinition() {
     std::cout << "error" << std::endl;
 
 
-  std::vector<DefinitionBox> definitions;
-  std::vector<CallBox> calls;
-
+  // find all the boxes within the current definition
   BoxFinder bf;
   for(std::size_t i = 1; i < contents.size() - 1; i++) {
     std::size_t len = contents[i].size();
+    // we want to cut off the edges of the box
+    // so that they are not included in any of the
+    // internal boxes
+    // the 2 comes from taking one character off each side
     bf.process(contents[i].substr(1, len - 2));
   }
-
   std::vector<UnparsedBox> boxes;
   bf.move(boxes);
 
+  // parse these boxes and add them to the appropriate list
+  std::vector<DefinitionBox> definitions;
+  std::vector<CallBox> calls;
   for(UnparsedBox b : boxes) {
     b.parseEdges();
     if(b.isDef()) {
@@ -108,9 +114,9 @@ DefinitionBox UnparsedBox::makeDefinition() {
   }
 
   std::vector<Connection> connections;
-  // this does a swap on contents and pins
   FindConnections fc = FindConnections(contents, pins, calls, definitions, tlx, tly);
   fc.process();
+  fc.move(connections);
 
   return DefinitionBox(name, pins, definitions, calls, connections, tlx, tly);
 }

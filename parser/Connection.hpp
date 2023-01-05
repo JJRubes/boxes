@@ -23,6 +23,32 @@ class Connection {
       ordered = o;
     }
 
+    void print(std::size_t indentation, std::size_t indentSize) {
+      std::string indent(indentation * indentSize, ' ');
+      std::string additional(indentSize, ' ');
+      std::cout << indent << "Connection:\n";
+      std::cout << indent << additional << "From:\n";
+      std::cout << indent << additional << additional << "Box: ";
+      if(t1 == BoxType::SELF)
+        std::cout << "Self\n";
+      else if(t1 == BoxType::CALL) {
+        std::cout << "Call[" << b1 << "]\n";
+      } else {
+        std::cout << "Definition[" << b1 << "]\n";
+      }
+      std::cout << indent << additional << additional << additional << "Pin: " << p1;
+      std::cout << indent << additional << "To:\n";
+      std::cout << indent << additional << additional << "Box: ";
+      if(t2 == BoxType::SELF)
+        std::cout << "Self\n";
+      else if(t2 == BoxType::CALL) {
+        std::cout << "Call[" << b2 << "]\n";
+      } else {
+        std::cout << "Definition[" << b2 << "]\n";
+      }
+      std::cout << indent << additional << additional << additional << "Pin: " << p2;
+    }
+
     BoxType t1, t2;
     size_t b1, b2;
     size_t p1, p2;

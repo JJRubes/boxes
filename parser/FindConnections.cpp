@@ -326,7 +326,7 @@ void FindConnections::process() {
 int FindConnections::getPinX(Connection::BoxType t, size_t b, size_t p) {
   int x = getPin(t, b, p).x();
   if(t == Connection::BoxType::SELF) {
-    // x -= selfOffsetX;
+    // x -= selfOffsetX; // this does mean that passing x is redundant
   } else if(t == Connection::BoxType::CALL) {
     x += calls[b].getX();
   } else {
@@ -347,12 +347,14 @@ int FindConnections::getPinY(Connection::BoxType t, size_t b, size_t p) {
   return y;
 }
 
-void FindConnections::print() {
+void FindConnections::move(std::vector<Connection> &cns) {
+  connections.swap(cns);
+}
+
+void FindConnections::print(size_t indentation, size_t indentSize) {
+  std::string indent(indentation * indentSize, ' ');
+  std::cout << indent << "Connections:\n";
   for(Connection c : connections) {
-    std::cout << "P1: " << c.p1;
-    std::cout << ", P2: " << c.p2;
-    std::cout << ", type: " << c.type;
-    std::cout << ", Ordered: " << c.ordered;
-    std::cout << std::endl;
+    c.print(indentation + 1, indentSize);
   }
 }

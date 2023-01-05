@@ -67,8 +67,24 @@ void DefinitionBox::print(std::size_t indentation, std::size_t indentSize) {
     std::cout << indent << additional << "Connections:\n";
     for(Connection c : connections) {
       std::cout << indent << additional << additional << "  Connection:\n";
-      std::cout << indent << additional << additional << additional << "(" << pins[c.p1].getId();
-      std::cout << ", " << pins[c.p2].getId() << ")\n";
+      std::cout << indent << additional << additional << additional << "(";
+      if(c.t1 == Connection::BoxType::SELF) {
+        std::cout << "self." << pins[c.p1].getId();
+      } else if(c.t1 == Connection::BoxType::CALL) {
+        std::cout << "calls." << calls[c.b1].getName() << "." << calls[c.b1].getPin(c.p1).getId();
+      } else {
+        std::cout << "definitions." << definitions[c.b1].getName() << "." << definitions[c.b1].getPin(c.p1).getId();
+      }
+      std::cout << ",\n";
+      std::cout << indent << additional << additional << additional << additional;
+      if(c.t2 == Connection::BoxType::SELF) {
+        std::cout << "self." << pins[c.p2].getId();
+      } else if(c.t2 == Connection::BoxType::CALL) {
+        std::cout << "calls." << calls[c.b2].getName() << "." << calls[c.b2].getPin(c.p2).getId();
+      } else {
+        std::cout << "definitions." << definitions[c.b2].getName() << "." << definitions[c.b2].getPin(c.p1).getId();
+      }
+      std::cout << ")\n";
     }
   } else {
     std::cout << indent << additional << "Connections: None\n";

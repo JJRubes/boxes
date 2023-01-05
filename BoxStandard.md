@@ -94,7 +94,7 @@ Names are read left to right for if they are on the top edge, and top to bottom 
    +-+  +-+
 ```
 A collection of possible definitions for "name".
-I don't know how I want to handle if there is a name on more than one edge.
+I don't know how I want to handle if there is a name on more than one edge. I think either by concatenating them with a ' ' or newline between them. 
 Function names can contain spaces, but not '+'. 
 ```
   +- box with spaces in the name -+
@@ -102,7 +102,7 @@ Function names can contain spaces, but not '+'.
   +-------------------------------+
 ```
 A definition of the function "box with spaces in the name".
-A name cannot contain only spaces.
+A name cannot contain only spaces as it seems odd to be able to name a function "".
 ```
   +-     -+
   |       |
@@ -110,10 +110,7 @@ A name cannot contain only spaces.
 ```
 A definition with an invalid name.
 ## Pins
-Pins are how data is passed to function calls. An output pin of one function is connected to an input pin of another, and when all the inputs to a function have recieved an input the function is run on this data. 
-A pin can be any character that is not '+', ' ', '-', or '|'.
-a character can be used only once for either input or output
-unless it not ambiguous which is input and output or if it is
+Pins are how data is passed to function calls. An output pin of one function is connected to an input pin of another, and when all the inputs to a function have recieved an input the function is run on this data. A pin can be any character that is not '+', ' ', '-', or '|'. In a function's definition a character can be used only once for input or output. It can be used once for input and once for output.
 being overloaded
 ```
   +--- example ----+
@@ -166,9 +163,7 @@ being overloaded
   |               |              |  to parse.
   +---------------o--------------+
 ```
-if there is a pin that could accept multiple types
-and there is a pin that can accept a specific type
-always choose the more specific type
+If there is a pin that could accept multiple types and there is a pin that can accept a specific type always choose the more specific type.
 
 # Program Flow
 A function only executes when all of its inputs are satisfied. So the first functions to execute is either a function with no inputs, or whose inputs are provided by the input of the function. If two functions have unrelated inputs there is no guaruntee for the order that they will be executed in. Therefore, controlling program becomes controlling when and how functions receive input.

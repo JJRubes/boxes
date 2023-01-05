@@ -16,7 +16,8 @@ class FindConnections {
                     const std::vector<DefinitionBox> &db,
                     int x, int y);
     void process();
-    void print();
+    void move(std::vector<Connection> &cns);
+    void print(size_t indentation, size_t indentSize);
 
   private:
     std::vector<std::string> contents;

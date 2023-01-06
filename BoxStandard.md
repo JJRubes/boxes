@@ -254,7 +254,7 @@ The "if" function will likely be the simplest core function for this to work. Ho
   +-- if a else b ---+
   |                  |
   |  +---+   +-----+ |
-  i--i s a---i not | |
+  c--i s a---i not | |
   |  +-b-+   +--o--+ |
   |    |        |    |
   |  +-i--+  +--i-+  |

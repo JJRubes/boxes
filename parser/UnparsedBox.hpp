@@ -11,12 +11,13 @@ class UnparsedBox {
   public:
     UnparsedBox(int x, int y, std::vector<std::string> lines);
     bool isDef();
-    void parseEdges();
     DefinitionBox makeDefinition();
     CallBox makeCall();
     void print();
 
   private:
+    void parseEdges();
+
     const bool isPin(char p);
     char at(int x, int y);
     void parseName();

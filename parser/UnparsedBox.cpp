@@ -18,21 +18,16 @@ UnparsedBox::UnparsedBox(int x, int y, std::vector<std::string> lines) {
   width = contents[0].size();
   height = contents.size();
 
-  edgesParsed = false;
   definition = false;
+
+  parseEdges();
 }
 
 bool UnparsedBox::isDef() {
-  if(!edgesParsed)
-    std::cout << "error" << std::endl;
-
   return definition;
 }
 
 void UnparsedBox::parseEdges() {
-  if(edgesParsed)
-    std::cout << "error" << std::endl;
-
   parseName();
 
   // parse the pins
@@ -78,17 +73,12 @@ void UnparsedBox::parseEdges() {
 }
 
 DefinitionBox UnparsedBox::makeDefinition() {
-  // print();
-
   // checks to make sure that the Unparsed box is being used correctly
-  if(!edgesParsed)
-    std::cout << "error" << std::endl;
-
   if(!definition)
     std::cout << "error" << std::endl;
 
 
-  // find all the boxes within the current definition
+  // find all the boxes within this box
   BoxFinder bf;
   for(std::size_t i = 1; i < contents.size() - 1; i++) {
     std::size_t len = contents[i].size();
@@ -105,7 +95,6 @@ DefinitionBox UnparsedBox::makeDefinition() {
   std::vector<DefinitionBox> definitions;
   std::vector<CallBox> calls;
   for(UnparsedBox b : boxes) {
-    b.parseEdges();
     if(b.isDef()) {
       definitions.push_back(b.makeDefinition());
     } else {
@@ -113,6 +102,7 @@ DefinitionBox UnparsedBox::makeDefinition() {
     }
   }
 
+  // find which pins are connected to which
   std::vector<Connection> connections;
   FindConnections fc = FindConnections(contents, pins, calls, definitions, tlx, tly);
   fc.process();
@@ -122,9 +112,6 @@ DefinitionBox UnparsedBox::makeDefinition() {
 }
 
 CallBox UnparsedBox::makeCall() {
-  if(!edgesParsed)
-    std::cout << "error" << std::endl;
-
   if(definition)
     std::cout << "error" << std::endl;
 
@@ -142,7 +129,8 @@ CallBox UnparsedBox::makeCall() {
       startPos++;
     }
 
-    // remove ending spaces
+    // remove ending spaces while not removing
+    // spaces in between
     for(size_t j = startPos; j < contents.at(i).size() - 1; j++) {
       char c = contents.at(i).at(j);
       if(c == ' ') {
@@ -170,25 +158,19 @@ CallBox UnparsedBox::makeCall() {
       name += l;
     }
   }
-  // print();
+
   return CallBox(name, pins, tlx, tly);
 }
 
 void UnparsedBox::print() {
-  if(!edgesParsed) {
-    for(std::string s : contents) {
-      std::cout << s << std::endl;
-    }
+  if(isDef()) {
+    std::cout << "Definition ";
   } else {
-    if(isDef()) {
-      std::cout << "Definition ";
-    } else {
-      std::cout << "Call ";
-    }
-    std::cout << name << ": " << std::endl;
-    for(Pin p : pins) {
-      p.print(0, 2);
-    }
+    std::cout << "Call ";
+  }
+  std::cout << name << ": " << std::endl;
+  for(Pin p : pins) {
+    p.print(0, 2);
   }
   std::cout << "At (" << tlx << ", " << tly << ")";
 }
@@ -205,8 +187,6 @@ char UnparsedBox::at(int x, int y) {
 }
 
 void UnparsedBox::parseName() {
-  edgesParsed = true;
-
   // check the top line
   int start = scanHorizontal(0, true);
   if(start != -1) {

@@ -37,8 +37,12 @@ void CallBox::print(std::size_t indentation, std::size_t indentSize) {
   std::string additional(indentSize, ' ');
   std::cout << indent << "Call:\n";
   std::cout << indent << additional << "Name: \"" << name << "\"\n";
-  std::cout << indent << additional << "Pins:\n";
-  for(Pin p : pins) {
-    p.print(indentation + 2, indentSize);
+  if(pins.size() > 0) {
+    std::cout << indent << additional << "Pins:\n";
+    for(Pin p : pins) {
+      p.print(indentation + 2, indentSize);
+    }
+  } else {
+    std::cout << indent << additional << "Pins: None\n";
   }
 }

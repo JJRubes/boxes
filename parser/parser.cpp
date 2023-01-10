@@ -51,7 +51,6 @@ class Program {
       // }
 
       UnparsedBox ub(1, 1, contents);
-      ub.parseEdges();
       if(!ub.isDef()) {
         std::cout << "Oh no" << std::endl;
       }

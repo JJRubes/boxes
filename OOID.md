@@ -1,12 +1,9 @@
-# Boxes
-Temporary name for the language.
-
+# Ooid
+An ooid is a sedimentary grain formed from concetric layers of usually calcium carbonate around nucleus. Oolite occurs when ooids are cemented together to form a rock. An Ooid program is made up of nuclei, the function calls, and ooids, the function definitions. Together these form the oolite, a program. Ooid is a 2D flow based functional language with type inference. God help me.
 ## Basics
-[Language Name] arose from the idea of using ASCII style boxes to represent functions, and to connect these functions to create flow. What has resulted is a very verbose language. 
+Ooid arose from the idea of using ASCII style boxes to represent functions, and to connect these functions to create flow. What has resulted is a very verbose language. Function calls and definitions both use what I will call pins and wires, for lack of a more thematic name. Pins are like function arguments and return types, and are connected to pins of other functions by wires. If the whole program were considered a network, then the calls would be nodes, and the wires would be edges.
 
-## Boxes
-Boxes make up the bulk of [Language Name], as they are how functions are called and defined. 
-### Edges
+## Edges
 A box is primarily defined by its edge. The edge of a box contains all of th pins, as well as the name if it is a function definition. The edge is made up of a '+' in each corner. The top and bottom edges are made up of '|' or '-'. Other characters, not part of a function definition name, are interpretted as pins. For simplicity, ' ', '+', '|', and '-' are not valid pins. 
 ```
   +-----+
@@ -15,7 +12,6 @@ A box is primarily defined by its edge. The edge of a box contains all of th pin
   +-----+
 ```
 An example box.
-
 ## Functions
 Every box is either a fucntion call or a function definition. A function call is connected to other function calls by wires between pins. A function definition's pins are only connected to function calls within the definition (should you be able to have an anonymous function that contains a definition but also connects to other calls?).
 ### Calls
@@ -193,7 +189,7 @@ There was an older version of overloading which has since been superseded by def
   +---------------o--------------+
 ```
 ## Program Flow
-A function only executes when all of its inputs are satisfied. So the first functions to execute is either a function with no inputs, or whose inputs are provided by the input of the function. If two functions have unrelated inputs there is no guaruntee for the order that they will be executed in. Therefore, controlling program becomes controlling when and how functions receive input.
+A function only executes when all of its inputs are satisfied. So the first functions to execute is either a function with no inputs, or whose inputs are provided by the input of the function. If two functions have unrelated inputs there is no guaruntee for the order that they will be executed in. Therefore, controlling program becomes controlling when and how functions receive input. 
 ### Splitting Outputs
 Currently to split an output I have decided to use a core library function "s" which provides the same output on more than one pin. However, there are many ways that I could allow splitting and I have yet to decide on which.
 #### Dedicated Function
@@ -207,13 +203,13 @@ The "s" function with input 'i' and output 'a', 'b' and optionally 'c'.
 #### Duplicate Pins
 This is the most promising alternative. A function may have multiple copies of an output pin and each will provide the same data to the function they connect to. It is unclear for complex objects like lists if they should be copies or references.
 ```
-  +---+   +---+   +---+
-  | 1 | v-o 1 | v-o 1 o-v
-  +-o-+ | +-o-+ | +-o-+ |
-    |   |   |   |       |
-  +-x-+ | +-x-+ | +-x-+ |
-  | + y-< | + y-< | + y-<
-  +-o-+   +-o-+   +-o-+
+  +---+     +---+     +---+
+  | 1 |  v--o 1 |  v--o 1 o--v
+  +-o-+  |  +-o-+  |  +-o-+  |
+    |    |    |    |         |
+  +-x-+  |  +-x-+  |  +-x-+  |
+  | + y--<  | + y--<  | + y--<
+  +-o-+     +-o-+     +-o-+
 ```
 An example of 0, 1, and 2 duplicate pins of the literal function "1".
 #### Splitting Wires
@@ -233,7 +229,7 @@ The function "1" whose output is split by a 't' so that it can be the input of 3
 #### Duplicate Functions
 If you want an output more than once, just run the function more than once. This raises the issue of now there might be too many of a given pin. These pins could be omitted or treated as unnecessary pins, which are described below. Another flaw is that a function definition might have a pin that is used by several functions within its definition, and there is no clear way to duplicate the definition.
 ### Unneccesary Pins
-A function with a pin that does nothing can allow for more control over the order that functions are run. This is only significant for functions with side effects, such as "print".
+Because functions update all of their outputs simultaneously, a function with a pin that does nothing can allow for more control over the order that functions are run. This is most significant for functions with side effects, such as "print".
 ```
   +--- start print ---+  +- end print -+     +-----------+   +---------+
   |                   |  |             |     | "Hello, " |   | "World" |

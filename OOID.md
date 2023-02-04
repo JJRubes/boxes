@@ -131,6 +131,18 @@ A name cannot contain only spaces as it seems odd to be able to name a function 
   +-------+
 ```
 A definition with an invalid name.
+#### Overloading
+A function be overloaded by creating a more than one definition. Because of the type inference I plan to use, having 2 functions that differ only by the return type will can cause ambiguous programs. In this case I don't know if I the one closer in scope to replace the other one, or to disallow it.
+```
+  +---- 1 ----+    +---+
+  |           |    | 1 |
+  |  +-----+  |    +-o-+
+  |  | "2" o--o      |
+  |  +-----+  |  +---i---+
+  |           |  | print |
+  +-----------+  +-------+
+```
+If the new definition for 1 replaces the old definition, then the function prints "2" otherwise it should throw an error because it is not clear whether it should print "1" or "2".
 ### Pins
 Pins are how data is passed to function calls. An output pin of one function is connected to an input pin of another, and when all the inputs to a function have recieved an input the function can run. A pin can be any character that is not '+', ' ', '-', or '|'. A character can be used for both an input and an output.
 ```
@@ -404,11 +416,3 @@ To allow for a cleaner look I would like to support box drawing characters for t
   └─────┘
 ```
 An empty box and a small Hello World program using the box drawing character for the edges of the boxes.
-## Name
-I have no idea.
- - Boxes
- - Message Box
- - it's a bit functional, so function or func something
- - Get Rect
- - blorbo
- - Slowgoin'

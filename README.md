@@ -1,7 +1,4 @@
 # Ooid
-If you want to learn more about the language see OOID.md. The standard is far from complete, but should contain most of the important bits. So far I am still working on the parser, but not for much longer hopefully.
-```
-  [x] lexer
-  [*] parser
-  [ ] interpreter
-```
+If you want to learn more about the language see OOID.md. The standard is far from complete, but should contain most of the important bits. So far I am still working on the parser, but not for much longer hopefully. /examples contains what programs I have written in the language so far. I would love to be able to one day bootstrap a compiler for Ooid. 
+
+This is my first attempt at creating a language. The only experience I have had so far has been creating Hack and Jack from nand2tetris, so there is a lot for me to learn. I want the language to support type inference for example. Most of the code here is my first attempt at trying to run ooid programs. So far I have made a fairly basic lexer/parser (the distinction breaks down for 2D langauges), and an interpreter. I still need to connect them which will require some inroads into type infernce. Ooid doesn't distinguish parameters and return values but the interpreter needs to know which is which. 
